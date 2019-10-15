@@ -1,8 +1,30 @@
 version: '3'
 services:
-  web:
-    build: .
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=development
+    environment:
+      - PORT=3000
+      - POSTGRES_HOST=postgres
+      - POSTGRTS_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mercury
     ports:
-      - "3000:3000"
+      - 3000:3000
+    depends_on:
+      - postgres
+    links:
+      - postgres:postgres
     volumes:
-      - ./src:/usr/src/app/src
+    - ./src:/usr/src/app/src
+    command: npm run start:dev
+
+  postgres:
+    image: postgres:alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mercury
