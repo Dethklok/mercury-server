@@ -23,7 +23,7 @@ services:
     command: npm run start:dev
 
   postgres:
-    image: postgres:alpine
+    image: postgres:11.5-alpine
     restart: always
     environment:
       - POSTGRES_USER=postgres

@@ -1,50 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Article } from './interfaces/article.interface';
+import { Injectable, Inject, NotFoundException, HttpException } from '@nestjs/common';
+import { Repository } from 'typeorm';
+
+import { ARTICLE_REPOSITORY } from './constants/providers.constants';
+import { Article } from './article.entity';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
 export class ArticlesService {
-  private readonly articles: Article[] = [];
+  constructor(
+    @Inject(ARTICLE_REPOSITORY)
+    private readonly articleRepository: Repository<Article>,
+  ) {}
 
-  create(createArticleDto: CreateArticleDto): number {
-    const article: Article = {
-      id: this.articles.length,
-      ...createArticleDto,
-    };
-
-    this.articles.push(article);
+  async create(createArticleDto: CreateArticleDto): Promise<number> {
+    const article = await this.articleRepository.save(this.articleRepository.create(createArticleDto));
     return article.id;
   }
 
-  getAll(): Article[] {
-    return [...this.articles];
-  }
-
-  getOne(id: number): Article {
-    const [article, _] = this.find(id);
-    return { ...article };
-  }
-
-  update(id: number, updateArticleDto: UpdateArticleDto): null {
-    const [article, index] = this.find(id);
-
-    this.articles[index] = {
-      ...article,
-      ...updateArticleDto,
-    };
-
-    return null;
-  }
-
-  private find(id: number): [Article, number] {
-    const article = this.articles.find(curArticle => curArticle.id === id);
-    const index = this.articles.indexOf(article);
-
-    if (!article) {
-      throw new NotFoundException('Article not found.');
-    }
-
-    return [article, index];
+  async getAll(): Promise<Article[]> {
+    return await this.articleRepository.find();
   }
 }
