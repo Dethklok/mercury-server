@@ -11,7 +11,7 @@ export const databaseProviders = [
       password: process.env.POSTGRES_PASSWORD,
       database: 'postgres',
       entities: [
-        __dirname + '/../**/*.entity.ts',
+        __dirname + '/../**/*.entity{.ts,.js}',
       ],
       synchronize: true,
     }),
